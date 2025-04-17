@@ -1,0 +1,97 @@
+# ───────────────────────────────────────────────────
+# Demo Pipeline: echoes through multi‑stage flow
+# ───────────────────────────────────────────────────
+
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  demoVar: 'HelloDemo'
+
+pool:
+  name: Default
+
+stages:
+
+# ──────────────── Stage A: Build ────────────────
+- stage: Build
+  displayName: '🔨 Build'
+  jobs:
+    - job: BuildJob
+      displayName: 'Compile (echo)'
+      steps:
+        - script: |
+            echo "[$(Build.StageName)] Building... $(demoVar)"
+          displayName: 'Build step'
+
+        - script: |
+            echo "Publishing build artifact..."
+          displayName: 'Publish artifact'
+
+# ──────────────── Stage B: Test ────────────────
+- stage: Test
+  displayName: '🧪 Test'
+  dependsOn: Build     # runs only after Build completes
+  jobs:
+    - job: UnitTestJob
+      displayName: 'Unit tests'
+      steps:
+        - script: |
+            echo "[$(Build.StageName)] Running unit tests..."
+          displayName: 'Unit test step'
+
+    - job: IntegrationTestJob
+      displayName: 'Integration tests'
+      dependsOn: UnitTestJob   # job‑level dependency
+      steps:
+        - script: |
+            echo "[$(Build.StageName)] Running integration tests..."
+          displayName: 'Integration test step'
+
+# ──────────────── Stage C: Security (parallel) ────────────────
+- stage: Security
+  displayName: '🔒 Security Scan'
+  dependsOn: []        # empty list ⇒ starts in parallel to any other stage
+  jobs:
+    - job: SAST
+      displayName: 'Static Analysis'
+      steps:
+        - script: |
+            echo "[$(Build.StageName)] Running SAST..."
+          displayName: 'SAST echo'
+
+    - job: DAST
+      displayName: 'Dynamic Analysis'
+      steps:
+        - script: |
+            echo "[$(Build.StageName)] Running DAST..."
+          displayName: 'DAST echo'
+
+# ──────────────── Stage D: Deploy ────────────────
+- stage: Deploy
+  displayName: '🚀 Deploy'
+  dependsOn:
+    - Test
+    - Security    # waits for both Test & Security to finish
+  jobs:
+    - job: DeployJob
+      displayName: 'Deploy to Dev (echo)'
+      steps:
+        - script: |
+            echo "[$(Build.StageName)] Deploying application..."
+          displayName: 'Deploy step'
+
+# ──────────────── Stage E: Report ────────────────
+- stage: Report
+  displayName: '📊 Report'
+  # no dependsOn ⇒ runs after all prior stages (Build, Test, Security, Deploy) succeed
+  jobs:
+    - job: ReportJob
+      displayName: 'Generate report'
+      steps:
+        - script: |
+            echo "[$(Build.StageName)] Generating and publishing report..."
+          displayName: 'Report step'
+
