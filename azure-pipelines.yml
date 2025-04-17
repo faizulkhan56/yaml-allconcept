@@ -33,6 +33,30 @@ stages:
             echo "Publishing build artifact..."
           displayName: 'Publish artifact'
 
+- stage: InbuiltDemo
+  displayName: '👀 InbuiltVariable Demo'
+  dependsOn: Build
+  jobs:
+    - job: PrintVars
+      displayName: 'Echo Variables'
+      pool:
+        name: Default
+      steps:
+        - script: |
+            echo "=== Azure DevOps Variables Demo ==="
+            echo "Build ID            : $(Build.BuildId)"
+            echo "Build Number        : $(Build.BuildNumber)"
+            echo "Definition Name     : $(Build.DefinitionName)"
+            echo "Repo Name           : $(Build.Repository.Name)"
+            echo "Source Branch       : $(Build.SourceBranch)"
+            echo "Source Version (SHA): $(Build.SourceVersion)"
+            echo "Team Project        : $(System.TeamProject)"
+            echo "Stage Name          : $(System.StageName)"
+            echo "Job Name            : $(System.JobName)"
+            echo "Agent Name          : $(Agent.Name)"
+            echo "Agent OS            : $(Agent.OS)"
+          displayName: 'Print all key variables'
+
 # ──────────────── Stage B: Test ────────────────
 - stage: Test
   displayName: '🧪 Test'
