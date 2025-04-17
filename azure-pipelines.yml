@@ -21,9 +21,12 @@ stages:
   jobs:
     - job: BuildJob
       displayName: 'Compile (echo)'
+      variables:                  # these live only in the BuildJob
+        jobTimeoutSecs: 300
       steps:
         - script: |
-            echo "[$(Build.StageName)] Building... $(demoVar)"
+            echo "[$(System.StageName)] Building... $(demoVar)"
+            echo "This job has a timeout of $(jobTimeoutSecs) seconds."
           displayName: 'Build step'
 
         - script: |
