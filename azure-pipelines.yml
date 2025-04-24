@@ -55,6 +55,11 @@ stages:
             echo "Job Name            : $(System.JobName)"
             echo "Agent Name          : $(Agent.Name)"
             echo "Agent OS            : $(Agent.OS)"
+            echo "Pipeline Workspace              : $(Pipeline.Workspace)"
+            echo "Default Working Directory (s)   : $(System.DefaultWorkingDirectory)"
+            echo "Sources Directory (s)           : $(Build.SourcesDirectory)"
+            echo "Artifact Staging Directory (a)  : $(Build.ArtifactStagingDirectory)"
+            echo "Temporary Directory             : $(Agent.TempDirectory)"
           displayName: 'Print all key variables'
 
 # ──────────────── Stage B: Test ────────────────
